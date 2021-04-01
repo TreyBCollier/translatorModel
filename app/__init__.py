@@ -12,6 +12,10 @@ def index():
     return "Loading translation..."
 
 
+# @app.route('/translateSent/<sentence>')
+# def translateSent(sentence):
+#     return translate(sentence)
+
 @app.route('/translateSent/<sentence>')
 def translateSent(sentence):
-    return translate(sentence)
+    return sentence
