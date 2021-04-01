@@ -29,3 +29,5 @@ elif app.config["ENV"] == "development":
 else:
 
     app.config.from_object("config.ProductionConfig")
+
+from app import views
