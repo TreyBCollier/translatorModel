@@ -19,8 +19,6 @@ def index():
 
         args = request.args
 
-        args = translate(args)
-
         return render_template("public/index.html", args=args)
 
     return render_template("public/index.html", args=args)
