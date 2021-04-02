@@ -15,8 +15,4 @@ def index():
 
 @app.route('/translateSent/<sentence>')
 def translateSent(sentence):
-    translation = translate(sentence)
-    response = ""
-    if(translation):
-        response = translation
-    return response
+    return translate(sentence)
