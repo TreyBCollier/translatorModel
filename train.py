@@ -332,3 +332,7 @@ def translate(sentence):
     # print('Input: %s' % (sentence))
     # print('Predicted translation: {}'.format(result))
     return result
+
+
+def testFunc(sentence):
+    return "wag1 fam"

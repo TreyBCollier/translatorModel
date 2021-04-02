@@ -1,4 +1,5 @@
 from train import translate
+from train import testFunc
 
 import flask
 
@@ -14,4 +15,4 @@ def index():
 
 @app.route('/translateSent/<sentence>')
 def translateSent(sentence):
-    return translate(sentence)
+    return testFunc(sentence)
