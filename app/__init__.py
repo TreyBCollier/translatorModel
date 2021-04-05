@@ -1,5 +1,5 @@
 from train import translate
-from train import testFunc
+from trainEnglishToFrench import translateEnglishToFrench
 
 import flask
 
@@ -13,6 +13,11 @@ def index():
     return "Loading translation..."
 
 
-@app.route('/translateSent/<sentence>')
-def translateSent(sentence):
+@app.route('/translateFrench/<sentence>')
+def translateFrench(sentence):
     return translate(sentence)
+
+
+@app.route('/translateEnglish/<sentence>')
+def translateEnglish(sentence):
+    return translateEnglishToFrench(sentence)

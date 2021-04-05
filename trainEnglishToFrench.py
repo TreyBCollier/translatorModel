@@ -90,11 +90,11 @@ frenchTraining, frenchValue, englishTraining, englishValue = train_test_split(
 
 
 dataset = tf.data.Dataset.from_tensor_slices(
-    (frenchTensor, englishTensor)).shuffle(len(frenchTensor))
+    (englishTensor, frenchTensor)).shuffle(len(englishTensor))
 dataset = dataset.batch(64, drop_remainder=True)
 
-encoder = Encoder(len(frenchData.word_index)+1, 256, 1024, 64)
-decoder = Decoder(len(englishData.word_index)+1, 256, 1024, 64)
+encoder = Encoder(len(englishData.word_index)+1, 256, 1024, 64)
+decoder = Decoder(len(frenchData.word_index)+1, 256, 1024, 64)
 
 
 optimizer = tf.keras.optimizers.Adam()
@@ -120,23 +120,23 @@ checkpoint = tf.train.Checkpoint(optimizer=optimizer,
                                  decoder=decoder)
 
 
-@ tf.function
-def epcohSteps(french, english, hiddenEncoding):
+@tf.function
+def train_step(english, french, hiddenEncoding):
     loss = 0
 
     with tf.GradientTape() as tape:
-        enc_output, hiddenEncoding = encoder(french, hiddenEncoding)
+        enc_output, hiddenEncoding = encoder(english, hiddenEncoding)
 
         hiddenDecoding = hiddenEncoding
 
         inputDecoding = tf.expand_dims(
-            [englishData.word_index['<s>']] * 64, 1)
+            [frenchData.word_index['<s>']] * 64, 1)
 
         # Teacher forcing - feeding the target as the next input
-        dataLength = english.shape[1]
+        dataLength = french.shape[1]
 
         for i in range(1, dataLength):
-            subData = english[:, i]
+            subData = french[:, i]
             # passing enc_output to the decoder
             predictions, hiddenDecoding, _ = decoder(
                 inputDecoding, hiddenDecoding, enc_output)
@@ -159,12 +159,12 @@ def epcohSteps(french, english, hiddenEncoding):
 
 
 # for epoch in range(10):
-#
+
 #     hiddenEncoding = encoder.hiddenStateInit()
 #     total_loss = 0
 
-#     for (batch, (french, english)) in enumerate(dataset.take(len(frenchTraining)//64)):
-#         batchLoss = epcohSteps(french, english, hiddenEncoding)
+#     for (batch, (english, french)) in enumerate(dataset.take(len(englishTraining)//64)):
+#         batchLoss = train_step(english, french, hiddenEncoding)
 #         total_loss = total_loss + batchLoss
 
 #     # saving (checkpoint) the model every 2 epochs
@@ -174,9 +174,9 @@ def epcohSteps(french, english, hiddenEncoding):
 
 
 def calculateInput(sentence):
-    sentenceIn = [frenchData.word_index[i] for i in sentence.split(' ')]
+    sentenceIn = [englishData.word_index[i] for i in sentence.split(' ')]
     sentenceIn = tf.keras.preprocessing.sequence.pad_sequences([sentenceIn],
-                                                               maxlen=frenchDataLength,
+                                                               maxlen=englishDataLength,
                                                                padding='post')
     sentenceIn = tf.convert_to_tensor(sentenceIn)
 
@@ -193,9 +193,9 @@ def evaluate(sentence):
     ouputEncoding, hiddenEncoding = encoder(formatSentence, hidden)
 
     hiddenDecoding = hiddenEncoding
-    inputDecoding = tf.expand_dims([englishData.word_index['<s>']], 0)
+    inputDecoding = tf.expand_dims([frenchData.word_index['<s>']], 0)
 
-    for i in range(englishDataLength):
+    for i in range(frenchDataLength):
         predictions, hiddenDecoding, bahdanauWeights = decoder(inputDecoding,
                                                                hiddenDecoding,
                                                                ouputEncoding)
@@ -204,9 +204,9 @@ def evaluate(sentence):
 
         prediction = tf.argmax(predictions[0]).numpy()
 
-        result = result + englishData.index_word[prediction] + " "
+        result = result + frenchData.index_word[prediction] + " "
 
-        if('<e>' == englishData.index_word[prediction]):
+        if('<e>' == frenchData.index_word[prediction]):
             return result
 
         # the predicted ID is fed back into the model
@@ -215,9 +215,9 @@ def evaluate(sentence):
     return result
 
 
-def translate(sentence):
+def translateEnglishToFrench(sentence):
     checkpoint.restore(tf.train.latest_checkpoint(
-        './training_checkpoints'))
+        './training_checkpointsEnglishToFrench'))
     result = evaluate(sentence)
 
     return result
