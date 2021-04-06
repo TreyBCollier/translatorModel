@@ -1,22 +1,18 @@
 
 
+import io
+import os
+import numpy as np
+import re
+import unicodedata
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
-# import matplotlib.pyplot as plt
-# import matplotlib.ticker as ticker
-from sklearn.model_selection import train_test_split
-
-import unicodedata
-import re
-import numpy as np
-import os
-import io
-import time
 
 from encoder import Encoder
 from decoder import Decoder
 
-path_to_file = "fra.txt"
+filePath = "fra.txt"
 
 
 def sentencePreprocessing(sentence):
@@ -27,9 +23,8 @@ def sentencePreprocessing(sentence):
     sentence = re.sub(r"([?.!,¿])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
 
-    # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
+    # replacing everything with space except for letters and punctuation
     sentence = re.sub(r"[^a-zA-Z?.!,¿]+", " ", sentence)
-
     sentence = sentence.strip()
 
     # Adding tags to the sentence so it knows the start and end of each sentence
@@ -38,53 +33,57 @@ def sentencePreprocessing(sentence):
 
 
 def buildDataset(path, data):
-    # sample = io.open(path, encoding='UTF-8').read().strip().split('\n')
+    #  removing accents for the encoding
     pairs = [[sentencePreprocessing(sentence) for sentence in l.split(
         '\t')] for l in io.open(path, encoding='UTF-8').read().strip().split('\n')[:data]]
+    # retuning pairs of words - [English , French]
     return zip(*pairs)
+
+# derives tenor from the data - a generalisation of vectors
 
 
 def getTensor(token, lang):
     tensor = token.texts_to_sequences(lang)
+    # padding text
     tensor = tf.keras.preprocessing.sequence.pad_sequences(tensor,
                                                            padding='post')
     return tensor
 
 
 def tokenizeData(lang):
+    # tokenizing data
     tokenizedLanguage = tf.keras.preprocessing.text.Tokenizer(filters='')
     tokenizedLanguage.fit_on_texts(lang)
-
     tensor = getTensor(tokenizedLanguage, lang)
 
     return tensor, tokenizedLanguage
 
 
 def getData(file, data=None):
-    # creating cleaned input, output pairs
+    # Get pairs of cleaned english and french data
     englishData, frenchData = buildDataset(file, data)
-
     frenchTensor, frenchTokenizer = tokenizeData(frenchData)
     englishTensor, englishTokenizer = tokenizeData(englishData)
 
     return [frenchTensor, englishTensor, frenchTokenizer, englishTokenizer]
 
 
-# Try experimenting with the size of that dataset
+# specifying the number of lines of the corpus to use
+# for reasons relating to computing power, 100,000 was decided
 num_examples = 100000
 loadedData = getData(
-    path_to_file, num_examples)
+    filePath, num_examples)
 
 frenchTensor = loadedData[0]
 englishTensor = loadedData[1]
 frenchData = loadedData[2]
 englishData = loadedData[3]
 
-# Calculate max_length of the target tensors
+# uses shape of the data tensor/vector to calculate the maximum length
 englishDataLength = englishTensor.shape[1]
 frenchDataLength = frenchTensor.shape[1]
 
-# Creating training and validation sets using an 80-20 split
+# splitting training/testing data using the common 80/20 split
 frenchTraining, frenchValue, englishTraining, englishValue = train_test_split(
     frenchTensor, englishTensor, test_size=0.2)
 

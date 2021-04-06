@@ -1,22 +1,17 @@
 
 
-import tensorflow as tf
-
-# import matplotlib.pyplot as plt
-# import matplotlib.ticker as ticker
-from sklearn.model_selection import train_test_split
-
-import unicodedata
-import re
-import numpy as np
-import os
 import io
-import time
+import os
+import numpy as np
+import re
+import unicodedata
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
 
 from encoder import Encoder
 from decoder import Decoder
 
-path_to_file = "fra.txt"
+filePath = "fra.txt"
 
 
 def sentencePreprocessing(sentence):
@@ -73,7 +68,7 @@ def getData(file, data=None):
 # Try experimenting with the size of that dataset
 num_examples = 100000
 loadedData = getData(
-    path_to_file, num_examples)
+    filePath, num_examples)
 
 frenchTensor = loadedData[0]
 englishTensor = loadedData[1]
