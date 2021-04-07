@@ -9,7 +9,7 @@ class Encoder(tf.keras.Model):
     def __init__(self, vocabulary, dimension, encdoding, batchSize):
         super(Encoder, self).__init__()
         self.encdoding = encdoding
-
+        # GRU - Grated Recurrent Unit is an RNN
         self.gru = tf.keras.layers.GRU(encdoding,
                                        return_sequences=True,
                                        return_state=True,

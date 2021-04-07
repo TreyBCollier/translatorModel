@@ -14,11 +14,10 @@ class Bahdanau(tf.keras.layers.Layer):
         hidenStateShape = tf.expand_dims(bahdanaQuery, 1)
         score = self.V(tf.nn.tanh(
             self.W2(bahdanavValues) + self.W1(hidenStateShape)))
-
-        # bahdanauWeights shape == (64, max_length, 1)
+        # softmax typically applies to the last axis
+        # we want to assign a weight to each input so we apply softmax on the first axis
         bahdanauWeights = tf.nn.softmax(score, axis=1)
-
-        # context_vector shape after sum == (64, hidden_size)
+        # vector passed into the GRU during decoding
         bahdanauVector = tf.reduce_sum(
             bahdanauWeights * bahdanavValues, axis=1)
 
