@@ -32,3 +32,7 @@ class Decoder(tf.keras.Model):
         x = self.fc(output)
 
         return x, stateVector, bahdanauWeights
+
+# Inspired and modified from TensorFlow example
+# TensorFlow Addons Networks : Sequence-to-Sequence NMT with Attention Mechanism
+# 2021

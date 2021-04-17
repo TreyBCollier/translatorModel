@@ -6,6 +6,7 @@ class Bahdanau(tf.keras.layers.Layer):
 
     def __init__(self, unitValue):
         super(Bahdanau, self).__init__()
+        # Defining the densely-connected neural-network layers
         self.V = tf.keras.layers.Dense(1)
         self.W1 = tf.keras.layers.Dense(1024)
         self.W2 = tf.keras.layers.Dense(1024)
@@ -22,3 +23,7 @@ class Bahdanau(tf.keras.layers.Layer):
             bahdanauWeights * bahdanavValues, axis=1)
 
         return bahdanauVector, bahdanauWeights
+
+# Inspired and modified from TensorFlow example
+# TensorFlow Addons Networks : Sequence-to-Sequence NMT with Attention Mechanism
+# 2021

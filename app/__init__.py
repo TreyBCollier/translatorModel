@@ -1,5 +1,5 @@
 # Importing the translate functions
-from train import translate
+from trainFrenchToEnglish import translateFrenchToEnglish
 from trainEnglishToFrench import translateEnglishToFrench
 
 # Importing Flask
@@ -21,7 +21,7 @@ def index():
 
 @app.route('/translateFrench/<sentence>')
 def translateFrench(sentence):
-    return translate(sentence)
+    return translateFrenchToEnglish(sentence)
 
 # Set route for English-to-French transltion
 

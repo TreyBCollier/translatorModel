@@ -16,6 +16,7 @@ class Encoder(tf.keras.Model):
                                        recurrent_initializer=RECURRENT_INITIALISER)
         # 'glorot_uniform' draws samples from a uniform distribution
         self.batchSize = batchSize
+        # Defining the word embedding to be fed into the neural network (GRU)
         self.embedding = tf.keras.layers.Embedding(vocabulary, 256)
 
     def call(self, x, hiddenState):
@@ -25,3 +26,8 @@ class Encoder(tf.keras.Model):
 
     def hiddenStateInit(self):
         return tf.zeros((self.batchSize, self.encdoding))
+
+
+# Inspired and modified from TensorFlow example
+# TensorFlow Addons Networks : Sequence-to-Sequence NMT with Attention Mechanism
+# 2021
